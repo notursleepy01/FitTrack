@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -25,6 +25,14 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+      
+      - name: Recreate platform-specific files
+        run: flutter create --org dev.sleepy --platforms=android .
+      
+      # Let's keep the logo and NDK fixes from before
+      - name: Fix NDK version in build.gradle
+        run: |
+          sed -i '/android {/a \ \ \ \ ndkVersion = "27.0.12077973"' android/app/build.gradle.kts
 
       - name: Generate launcher icons
         run: flutter pub run flutter_launcher_icons
@@ -32,11 +40,12 @@ jobs:
       - name: Run Hive generator
         run: flutter pub run build_runner build --delete-conflicting-outputs
       
-      - name: Build APK
-        run: flutter build apk --release
+      # --- THIS IS THE KEY CHANGE ---
+      - name: Build DEBUG APK
+        run: flutter build apk --debug # Changed from --release to --debug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fittrack-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: fittrack-debug-apk # Renamed artifact for clarity
+          path: build/app/outputs/flutter-apk/app-debug.apk # The path for the debug APK is different
