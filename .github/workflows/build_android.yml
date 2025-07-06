@@ -29,7 +29,6 @@ jobs:
       - name: Recreate platform-specific files
         run: flutter create --org dev.sleepy --platforms=android .
       
-      # Let's keep the logo and NDK fixes from before
       - name: Fix NDK version in build.gradle
         run: |
           sed -i '/android {/a \ \ \ \ ndkVersion = "27.0.12077973"' android/app/build.gradle.kts
@@ -41,11 +40,11 @@ jobs:
         run: flutter pub run build_runner build --delete-conflicting-outputs
       
       # --- THIS IS THE KEY CHANGE ---
-      - name: Build DEBUG APK
-        run: flutter build apk --debug # Changed from --release to --debug
+      - name: Build Universal APK
+        run: flutter build apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fittrack-debug-apk # Renamed artifact for clarity
-          path: build/app/outputs/flutter-apk/app-debug.apk # The path for the debug APK is different
+          name: fittrack-universal-apk
+          path: build/app/outputs/flutter-apk/app-release.apk # The universal build command still produces a file named "app-release.apk"
