@@ -38,15 +38,16 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 # Configuration for the flutter_launcher_icons package
+# --- THIS IS THE SECTION THAT HAS BEEN CHANGED ---
 flutter_launcher_icons:
   android: true
   ios: true
   # The background of the adaptive icon.
-  adaptive_icon_background: "assets/logo/logo_background.svg"
+  adaptive_icon_background: "assets/logo/logo_background.png" # <--- CHANGED
   # The foreground of the adaptive icon (your dumbbell).
-  adaptive_icon_foreground: "assets/logo/logo_foreground.svg"
+  adaptive_icon_foreground: "assets/logo/logo_foreground.png" # <--- CHANGED
   # For standard non-adaptive icons (older Android versions)
-  image_path: "assets/logo/logo_foreground.svg"
+  image_path: "assets/logo/logo_foreground.png"              # <--- CHANGED
 
 flutter:
   uses-material-design: true
