@@ -41,7 +41,7 @@ dev_dependencies:
 # --- THIS IS THE SECTION THAT HAS BEEN CHANGED ---
 flutter_launcher_icons:
   android: true
-  ios: true
+  ios: false
   # The background of the adaptive icon.
   adaptive_icon_background: "assets/logo/logo_background.png" # <--- CHANGED
   # The foreground of the adaptive icon (your dumbbell).
