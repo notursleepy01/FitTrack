@@ -29,22 +29,27 @@ jobs:
       - name: Recreate platform-specific files
         run: flutter create --org dev.sleepy --platforms=android .
       
-      # --- ROBUST METHOD 1: PREPARE ANDROID MANIFEST ---
-      - name: Prepare Android Manifest
+      # --- NEW, ROBUST STRATEGY FOR ANDROID MANIFEST ---
+      - name: Prepare Android Manifest from Template
         run: |
           MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
-          # Use an awk command to replace the app label, which is more reliable than sed
-          awk -i inplace '{gsub(/android:label="fittrack"/,"android:label=\"FitTrack\"")}1' $MANIFEST_PATH
-          # Use echo to append permissions before the <application> tag
-          awk -i inplace '/<application/{print "    <uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>\n    <uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />"}1' $MANIFEST_PATH
-          # Use echo to append the receiver block after the </activity> tag
-          awk -i inplace '/<\/activity>/{print; print "        <receiver android:exported=\"false\" android:name=\"com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver\" />\n        <receiver android:exported=\"false\" android:name=\"com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.BOOT_COMPLETED\"/>\n                <action android:name=\"android.intent.action.MY_PACKAGE_REPLACED\"/>\n                <action android:name=\"android.intent.action.QUICKBOOT_POWERON\" />\n                <action android:name=\"com.htc.intent.action.QUICKBOOT_POWERON\"/>\n            </intent-filter>\n        </receiver>"}1' $MANIFEST_PATH
+          # Copy our reliable template over the generated one
+          cp ci_templates/AndroidManifest.template.xml $MANIFEST_PATH
+          
+          # Replace the app label placeholder
+          sed -i 's/__APP_LABEL__/FitTrack/g' $MANIFEST_PATH
 
-      # --- ROBUST METHOD 2: FIX NDK VERSION ---
-      - name: Fix NDK version in build.gradle
-        run: |
-          echo "" >> android/app/build.gradle.kts
-          echo "android.ndkVersion = \"27.0.12077973\"" >> android/app/build.gradle.kts
+          # Replace the notification permissions placeholder
+          PERMISSIONS='    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />'
+          sed -i "s|<!-- __NOTIFICATION_PERMISSIONS__ -->|$PERMISSIONS|g" $MANIFEST_PATH
+
+          # Replace the notification receivers placeholder
+          RECEIVERS='        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" \/>\n        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED" \/>\n                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" \/>\n                <action android:name="android.intent.action.QUICKBOOT_POWERON" \/>\n                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" \/>\n            <\/intent-filter>\n        <\/receiver>'
+          sed -i "s|<!-- __NOTIFICATION_RECEIVERS__ -->|$RECEIVERS|g" $MANIFEST_PATH
+
+      # Fix NDK version in build.gradle
+      - name: Fix NDK version
+        run: echo "android.ndkVersion = \"27.0.12077973\"" >> android/app/build.gradle.kts
       
       - name: Generate launcher icons
         run: flutter pub run flutter_launcher_icons
