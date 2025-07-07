@@ -2,7 +2,6 @@ name: fittrack
 description: A Flutter fitness tracker app.
 
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
@@ -12,46 +11,34 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # For local database
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.0.15
-
-  # Utility
   intl: ^0.18.1
   uuid: ^3.0.7
-
-  # For custom fonts
   google_fonts: ^5.1.0
+
+  # --- NEW PACKAGES FOR NOTIFICATIONS ---
+  flutter_local_notifications: ^16.3.0
+  flutter_timezone: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   
-  # For Hive code generation
   hive_generator: ^2.0.0
   build_runner: ^2.4.6
-
-  # For automatically generating app icons
   flutter_launcher_icons: ^0.13.1
-
   flutter_lints: ^2.0.0
 
-# Configuration for the flutter_launcher_icons package
-# --- THIS IS THE SECTION THAT HAS BEEN CHANGED ---
 flutter_launcher_icons:
   android: true
   ios: false
-  # The background of the adaptive icon.
-  adaptive_icon_background: "assets/logo/logo_background.png" # <--- CHANGED
-  # The foreground of the adaptive icon (your dumbbell).
-  adaptive_icon_foreground: "assets/logo/logo_foreground.png" # <--- CHANGED
-  # For standard non-adaptive icons (older Android versions)
-  image_path: "assets/logo/logo_foreground.png"              # <--- CHANGED
+  adaptive_icon_background: "assets/logo/logo_background.png"
+  adaptive_icon_foreground: "assets/logo/logo_foreground.png"
+  image_path: "assets/logo/logo_foreground.png"
 
 flutter:
   uses-material-design: true
-  
-  # Make sure the assets folder is registered
   assets:
     - assets/logo/
