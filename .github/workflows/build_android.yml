@@ -29,16 +29,21 @@ jobs:
       - name: Recreate platform-specific files
         run: flutter create --org dev.sleepy --platforms=android .
       
+      # --- CORRECTED STEP 1: PREPARE ANDROID MANIFEST ---
       - name: Prepare Android Manifest
         run: |
-          sed -i 's/android:label="fittrack"/android:label="FitTrack"/' android/app/src/main/AndroidManifest.xml
-          sed -i '/<application/i \    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />' android/app/src/main/AndroidManifest.xml
-          sed -i '/<\/activity>/a \        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />\n        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED"/>\n                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>\n                <action android:name="android.intent.action.QUICKBOOT_POWERON" />\n                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>\n            </intent-filter>\n        </receiver>' android/app/src/main/AndroidManifest.xml
-          
-      # --- THIS IS THE CORRECTED STEP ---
+          MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
+          # Set the app display name
+          sed -i 's/android:label="fittrack"/android:label="FitTrack"/' $MANIFEST_PATH
+          # Add notification permissions
+          sed -i '/<application/i \    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />' $MANIFEST_PATH
+          # Add notification receiver for scheduled notifications
+          sed -i '/<\/activity>/a \        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />\n        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED"/>\n                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>\n                <action android:name="android.intent.action.QUICKBOOT_POWERON" />\n                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>\n            </intent-filter>\n        </receiver>' $MANIFEST_PATH
+
+      # --- CORRECTED STEP 2: FIX NDK VERSION ---
       - name: Fix NDK version in build.gradle
         run: |
-          sed -i '/android {/a \ \ \ \ ndkVersion = "27.0.12077973"' android/app/build.gradle.kts
+          sed -i '/android {/a \    ndkVersion = "27.0.12077973"' android/app/build.gradle.kts
 
       - name: Generate launcher icons
         run: flutter pub run flutter_launcher_icons
