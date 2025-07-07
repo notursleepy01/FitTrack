@@ -18,9 +18,8 @@ dependencies:
   uuid: ^3.0.7
   google_fonts: ^5.1.0
 
-  # --- NEW PACKAGES FOR NOTIFICATIONS ---
-  flutter_local_notifications: ^16.3.0
-  flutter_timezone: ^1.0.8
+  # --- REPLACED PACKAGES WITH AWESOME NOTIFICATIONS ---
+  awesome_notifications: ^0.9.3
 
 dev_dependencies:
   flutter_test:

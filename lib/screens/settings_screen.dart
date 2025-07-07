@@ -14,11 +14,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final Box settingsBox = Hive.box('settings_box');
 
   bool _remindersEnabled = false;
-  TimeOfDay _selectedTime = const TimeOfDay(hour: 17, minute: 0); // Default 5:00 PM
+  TimeOfDay _selectedTime = const TimeOfDay(hour: 17, minute: 0);
 
   @override
   void initState() {
     super.initState();
+    // Request permission as soon as the settings page is opened
+    _notificationService.requestPermission();
     _loadSettings();
   }
 
@@ -48,6 +50,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _remindersEnabled = value;
     });
+    // If enabling for the first time, make sure we have permission
+    if (value) {
+      _notificationService.requestPermission();
+    }
     _saveAndSchedule();
   }
   

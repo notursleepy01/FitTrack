@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -6,12 +7,26 @@ import 'package:path_provider/path_provider.dart';
 import 'package:fittrack/models/exercise_model.dart';
 import 'package:fittrack/models/workout_session_model.dart';
 import 'package:fittrack/screens/home_screen.dart';
-import 'package:fittrack/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await NotificationService().init();
+  // Initialize Awesome Notifications
+  AwesomeNotifications().initialize(
+    'resource://drawable/res_app_icon', // Use the default icon
+    [
+      NotificationChannel(
+        channelKey: 'daily_workout_reminder_channel',
+        channelName: 'Workout Reminders',
+        channelDescription: 'Reminds you to work out every day.',
+        defaultColor: Colors.tealAccent,
+        ledColor: Colors.white,
+        importance: NotificationImportance.High,
+        channelShowBadge: true,
+      )
+    ],
+    debug: false, // Set to true to see logs
+  );
 
   final appDocumentDir = await getApplicationDocumentsDirectory();
   await Hive.initFlutter(appDocumentDir.path);
@@ -26,6 +41,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  // ... rest of MyApp is unchanged ...
   const MyApp({super.key});
 
   @override
@@ -36,9 +52,9 @@ class MyApp extends StatelessWidget {
       colorScheme: const ColorScheme.dark(
         primary: Colors.tealAccent,
         secondary: Colors.tealAccent,
-        surface: Color(0xFF1E1E1E),
-        onPrimary: Colors.black,
-        onSecondary: Colors.black,
+        surface: Color(0xFF1E1E1E), // Used for card backgrounds
+        onPrimary: Colors.black,   // Text on primary color
+        onSecondary: Colors.black, // Text on secondary color
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: const Color(0xFF1F1F1F),

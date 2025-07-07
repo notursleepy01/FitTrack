@@ -29,27 +29,13 @@ jobs:
       - name: Recreate platform-specific files
         run: flutter create --org dev.sleepy --platforms=android .
       
-      - name: Prepare Android Manifest from Template
+      # Prepare the manifest (this is much simpler now)
+      - name: Prepare Android Manifest
         run: |
-          MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
-          cp ci_templates/AndroidManifest.template.xml $MANIFEST_PATH
-          sed -i 's/__APP_LABEL__/FitTrack/g' $MANIFEST_PATH
-          PERMISSIONS='    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />'
-          sed -i "s|<!-- __NOTIFICATION_PERMISSIONS__ -->|$PERMISSIONS|g" $MANIFEST_PATH
-          RECEIVERS='        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" \/>\n        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED" \/>\n                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" \/>\n                <action android:name="android.intent.action.QUICKBOOT_POWERON" \/>\n                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" \/>\n            <\/intent-filter>\n        <\/receiver>'
-          sed -i "s|<!-- __NOTIFICATION_RECEIVERS__ -->|$RECEIVERS|g" $MANIFEST_PATH
-
-      # --- THIS STEP NOW FIXES NDK AND ENABLES DESUGARING ---
-      - name: Configure Gradle Build
-        run: |
-          # Add NDK Version
-          echo "" >> android/app/build.gradle.kts
-          echo "android.ndkVersion = \"27.0.12077973\"" >> android/app/build.gradle.kts
-          # Enable Core Library Desugaring
-          echo "" >> android/app/build.gradle.kts
-          echo "android.compileOptions.isCoreLibraryDesugaringEnabled = true" >> android/app/build.gradle.kts
-          # Add the desugaring dependency
-          echo "dependencies.add(\"coreLibraryDesugaring\", \"com.android.tools:desugar_jdk_libs:2.0.4\")" >> android/app/build.gradle.kts
+          sed -i 's/android:label="fittrack"/android:label="FitTrack"/' android/app/src/main/AndroidManifest.xml
+          # awesome_notifications does not require manual permission adding here
+          
+      # We no longer need to fix the NDK version or enable desugaring!
 
       - name: Generate launcher icons
         run: flutter pub run flutter_launcher_icons
