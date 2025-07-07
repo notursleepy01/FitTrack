@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:fittrack/models/workout_session_model.dart';
 import 'package:fittrack/screens/history_screen.dart';
+import 'package:fittrack/screens/settings_screen.dart';
 import 'package:fittrack/screens/workout_logging_screen.dart';
 import 'package:fittrack/widgets/dashboard_stat_card.dart';
 
@@ -16,6 +17,18 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('FitTrack Dashboard'),
         centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            tooltip: 'Settings',
+          ),
+        ],
       ),
       body: ValueListenableBuilder(
         valueListenable: Hive.box<WorkoutSession>('workout_box').listenable(),
