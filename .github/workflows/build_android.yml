@@ -31,7 +31,7 @@ jobs:
       
       - name: Prepare Android Manifest from Template
         run: |
-          # This part with sed for the manifest is working correctly, so we'll keep it.
+          # This part is correct and works well.
           MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
           cp ci_templates/AndroidManifest.template.xml $MANIFEST_PATH
           sed -i 's/__APP_LABEL__/FitTrack/g' $MANIFEST_PATH
@@ -40,14 +40,13 @@ jobs:
           RECEIVERS='        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" \/>\n        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED" \/>\n                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" \/>\n                <action android:name="android.intent.action.QUICKBOOT_POWERON" \/>\n                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" \/>\n            <\/intent-filter>\n        <\/receiver>'
           sed -i "s|<!-- __NOTIFICATION_RECEIVERS__ -->|$RECEIVERS|g" $MANIFEST_PATH
 
-      # --- THIS IS THE NEW, BULLETPROOF GRADLE CONFIGURATION USING ECHO ---
+      # --- THIS IS THE CORRECTED GRADLE CONFIGURATION ---
       - name: Configure Gradle Build
         run: |
           GRADLE_FILE="android/app/build.gradle.kts"
-          # Append all required configurations to the end of the file.
-          # Gradle is smart enough to process these correctly.
           echo "" >> $GRADLE_FILE
-          echo "android.compileSdkVersion = 33" >> $GRADLE_FILE
+          # --- THIS IS THE KEY CHANGE: ADDED QUOTES AROUND 33 ---
+          echo "android.compileSdkVersion = \"33\"" >> $GRADLE_FILE
           echo "android.ndkVersion = \"27.0.12077973\"" >> $GRADLE_FILE
           echo "android.compileOptions.isCoreLibraryDesugaringEnabled = true" >> $GRADLE_FILE
           echo "dependencies.add(\"coreLibraryDesugaring\", \"com.android.tools:desugar_jdk_libs:2.0.4\")" >> $GRADLE_FILE
