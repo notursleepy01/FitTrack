@@ -19,8 +19,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // Request permission as soon as the settings page is opened
-    _notificationService.requestPermission();
     _loadSettings();
   }
 
@@ -50,9 +48,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _remindersEnabled = value;
     });
-    // If enabling for the first time, make sure we have permission
-    if (value) {
-      _notificationService.requestPermission();
+    // Request notification permission when enabling
+    if(value) {
+       _notificationService.flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
     }
     _saveAndSchedule();
   }
