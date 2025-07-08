@@ -1,4 +1,3 @@
-# .github/workflows/build_android.yml
 name: Build FitTrack Android APK
 
 on:
@@ -32,6 +31,7 @@ jobs:
       
       - name: Prepare Android Manifest from Template
         run: |
+          # This part is correct and works well
           MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
           cp ci_templates/AndroidManifest.template.xml $MANIFEST_PATH
           sed -i 's/__APP_LABEL__/FitTrack/g' $MANIFEST_PATH
@@ -40,11 +40,15 @@ jobs:
           RECEIVERS='        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" \/>\n        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED" \/>\n                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" \/>\n                <action android:name="android.intent.action.QUICKBOOT_POWERON" \/>\n                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" \/>\n            <\/intent-filter>\n        <\/receiver>'
           sed -i "s|<!-- __NOTIFICATION_RECEIVERS__ -->|$RECEIVERS|g" $MANIFEST_PATH
 
+      # --- THIS IS THE CORRECTED GRADLE CONFIGURATION USING SED ---
       - name: Configure Gradle Build
         run: |
-          awk -i inplace '/defaultConfig {/i \    compileSdkVersion = 33\n    ndkVersion = "27.0.12077973"\n' android/app/build.gradle.kts
-          awk -i inplace '/defaultConfig {/i \    compileOptions {\n        isCoreLibraryDesugaringEnabled = true\n    }\n' android/app/build.gradle.kts
-          awk -i inplace '/dependencies {/a \    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")' android/app/build.gradle.kts
+          GRADLE_FILE="android/app/build.gradle.kts"
+          # Use sed to insert text before a specific line
+          sed -i '/defaultConfig {/i \    compileSdkVersion = 33\n    ndkVersion = "27.0.12077973"' $GRADLE_FILE
+          sed -i '/defaultConfig {/i \    compileOptions {\n        isCoreLibraryDesugaringEnabled = true\n    }' $GRADLE_FILE
+          # Use sed to append text after a specific line
+          sed -i '/dependencies {/a \    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")' $GRADLE_file
 
       - name: Generate launcher icons
         run: flutter pub run flutter_launcher_icons
